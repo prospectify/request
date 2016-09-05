@@ -1,5 +1,5 @@
 {
-  "name": "request",
+  "name": "@prospectify/request",
   "description": "Simplified HTTP request client.",
   "tags": [
     "http",

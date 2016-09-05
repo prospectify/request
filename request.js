@@ -87,6 +87,7 @@ function responseToJSON() {
   return {
     statusCode: self.statusCode,
     body: self.body,
+    cert: self.sslCert || null,
     headers: self.headers,
     request: requestToJSON.call(self.request)
   }
@@ -126,6 +127,9 @@ function Request (options) {
   self._multipart = new Multipart(self)
   self._redirect = new Redirect(self)
   self._tunnel = new Tunnel(self)
+
+  self.sslCert = null
+
   self.init(options)
 }
 
@@ -834,6 +838,13 @@ Request.prototype.onRequestResponse = function (response) {
   self.response = response
   response.request = self
   response.toJSON = responseToJSON
+  if( self.httpModule === https ){
+    var cert = response.socket.getPeerCertificate(true);
+    if( cert && Object.keys(cert).length > 0 ){
+      self.sslCert = cert
+    }
+  }
+  response.cert = self.sslCert || null;
 
   // XXX This is different on 0.10, because SSL is strict by default
   if (self.httpModule === https &&
